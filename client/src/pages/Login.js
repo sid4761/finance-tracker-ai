@@ -23,7 +23,13 @@ function Login() {
 
         } catch (error) {
             console.log(error);
-            alert("Login failed");
+
+            const message =
+                error.response?.data?.message ||
+                error.response?.data?.error ||
+                "Login failed";
+
+            alert(message);
         }
     };
 
@@ -68,45 +74,45 @@ function Login() {
                     />
 
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    style={{
-                        width: "100%",
-                        padding: "12px",
-                        margin: "10px 0",
-                        borderRadius: "8px",
-                        border: "1px solid #ccc"
-                    }}
-                />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            margin: "10px 0",
+                            borderRadius: "8px",
+                            border: "1px solid #ccc"
+                        }}
+                    />
 
-                <button
-                    type="submit"
-                    style={{
-                        width: "100%",
-                        padding: "12px",
-                        background: "#667eea",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "16px",
-                        marginTop: "15px",
-                        cursor: "pointer"
-                    }}
-                >
-                    Login
-                </button>
-            </form>
+                    <button
+                        type="submit"
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            background: "#667eea",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "16px",
+                            marginTop: "15px",
+                            cursor: "pointer"
+                        }}
+                    >
+                        Login
+                    </button>
+                </form>
 
-            <p style={{ textAlign: "center", marginTop: "15px" }}>
-                Don't have an account? <Link to="/register">Register</Link>
-            </p>
-        </div>
-    </div >
-  );
+                <p style={{ textAlign: "center", marginTop: "15px" }}>
+                    Don't have an account? <Link to="/register">Register</Link>
+                </p>
+            </div>
+        </div >
+    );
 }
 
 export default Login;
