@@ -127,7 +127,11 @@ function Dashboard() {
     };
 
     useEffect(() => {
-        refreshDashboard();
+        getTransactions();
+        getCategoryAnalytics();
+        getMonthlyAnalytics();
+        getAIInsights();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const totalSpent = transactions.reduce(
