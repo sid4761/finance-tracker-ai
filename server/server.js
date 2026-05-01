@@ -9,14 +9,23 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
-
 const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
 connectDB();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://finance-tracker-ai-pi.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // Routes
