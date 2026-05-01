@@ -5,13 +5,12 @@ import './Budget.css';
 const Budget = () => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // Default budget or load from localStorage
+
     const [budgetLimit, setBudgetLimit] = useState(() => {
         const saved = localStorage.getItem('monthlyBudget');
         return saved ? Number(saved) : 50000;
     });
-    
+
     const [inputBudget, setInputBudget] = useState(budgetLimit);
 
     useEffect(() => {
@@ -22,13 +21,12 @@ const Budget = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTransactions(res.data);
-                setLoading(false);
             } catch (error) {
                 console.error("Error fetching transactions:", error);
+            } finally {
                 setLoading(false);
             }
         };
-
         fetchTransactions();
     }, []);
 
@@ -41,48 +39,69 @@ const Budget = () => {
         }
     };
 
-    // Calculate current month's total expenses
     const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
+    const currentYear  = new Date().getFullYear();
+    const monthName    = new Date().toLocaleString('default', { month: 'long' });
+
     const currentMonthSpent = transactions.reduce((sum, t) => {
         const tDate = new Date(t.date);
         if (tDate.getFullYear() === currentYear && tDate.getMonth() === currentMonth) {
-            // Only sum positive amounts (expenses)
-            if (Number(t.amount) > 0) {
-                return sum + Number(t.amount);
-            }
+            if (Number(t.amount) > 0) return sum + Number(t.amount);
         }
         return sum;
     }, 0);
 
-    const percentage = budgetLimit > 0 ? (currentMonthSpent / budgetLimit) * 100 : 0;
+    const remaining       = Math.max(budgetLimit - currentMonthSpent, 0);
+    const percentage      = budgetLimit > 0 ? (currentMonthSpent / budgetLimit) * 100 : 0;
     const cappedPercentage = Math.min(percentage, 100);
-    
-    let progressClass = 'safe';
-    if (percentage > 90) progressClass = 'danger';
-    else if (percentage > 75) progressClass = 'warning';
+
+    // Determine status tier
+    let tier = 'safe';
+    if (percentage > 100)     tier = 'exceeded';
+    else if (percentage > 90) tier = 'danger';
+    else if (percentage > 75) tier = 'warning';
+
+    const statusConfig = {
+        safe:     { label: "✓  You're within budget",   color: '#10b981', bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.25)' },
+        warning:  { label: "⚠  Nearing your limit",     color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.25)' },
+        danger:   { label: "⚠  Close to budget limit",  color: '#ef4444', bg: 'rgba(239, 68, 68, 0.08)',  border: 'rgba(239, 68, 68, 0.25)'  },
+        exceeded: { label: "✗  Budget exceeded!",        color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)',  border: 'rgba(239, 68, 68, 0.4)'   },
+    };
+
+    const status   = statusConfig[tier];
+    const barClass = tier === 'warning' ? 'warning' : tier === 'safe' ? 'safe' : 'danger';
 
     if (loading) {
         return (
-            <div className="budget-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-                <p style={{ fontSize: '1.2rem', color: '#94a3b8' }}>Loading Budget Data...</p>
+            <div className="budget-container budget-loading">
+                <div className="budget-skeleton-card">
+                    <div className="skeleton-line wide"></div>
+                    <div className="skeleton-line medium"></div>
+                </div>
             </div>
         );
     }
-
-    const monthName = new Date().toLocaleString('default', { month: 'long' });
 
     return (
         <div className="budget-container">
             <div className="budget-header">
                 <h1>Monthly Budget Planner</h1>
-                <p>Track your spending limits for {monthName} {currentYear}.</p>
+                <p>Track your spending limits for <strong>{monthName} {currentYear}</strong>.</p>
             </div>
 
             <div className="budget-card">
+                {/* Card title */}
+                <div className="budget-card-title">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Budget Limit
+                </div>
+
+                {/* Set limit form */}
                 <form className="budget-form" onSubmit={handleSaveBudget}>
-                    <label>Set your monthly budget limit (₹)</label>
+                    <label>Set your monthly spending limit (₹)</label>
                     <div className="budget-input-group">
                         <input
                             type="number"
@@ -91,33 +110,80 @@ const Budget = () => {
                             min="1"
                             required
                         />
-                        <button type="submit">Update Limit</button>
+                        <button type="submit">Update</button>
                     </div>
                 </form>
 
+                {/* Stat row */}
+                <div className="budget-stats">
+                    <div className="budget-stat">
+                        <span className="stat-label">Spent</span>
+                        <span className="stat-value spent">₹{currentMonthSpent.toLocaleString()}</span>
+                    </div>
+                    <div className="budget-stat-divider"></div>
+                    <div className="budget-stat">
+                        <span className="stat-label">Limit</span>
+                        <span className="stat-value">₹{budgetLimit.toLocaleString()}</span>
+                    </div>
+                    <div className="budget-stat-divider"></div>
+                    <div className="budget-stat">
+                        <span className="stat-label">Remaining</span>
+                        <span className="stat-value remaining">₹{remaining.toLocaleString()}</span>
+                    </div>
+                </div>
+
+                {/* Progress section */}
                 <div className="budget-status">
-                    <div className="budget-amounts">
-                        <h2>₹{currentMonthSpent.toLocaleString()}</h2>
-                        <span>of ₹{budgetLimit.toLocaleString()} limit</span>
+
+                    {/* Percentage label row */}
+                    <div className="budget-percent-row">
+                        <span className="budget-percent-badge" style={{ color: status.color }}>
+                            {percentage.toFixed(1)}% used
+                        </span>
+                        <span className="budget-percent-left" style={{ color: status.color }}>
+                            {remaining > 0 ? `₹${remaining.toLocaleString()} left` : 'Over budget'}
+                        </span>
                     </div>
 
+                    {/* Progress bar */}
                     <div className="progress-bar-container">
-                        <div 
-                            className={`progress-bar ${progressClass}`} 
+                        <div
+                            className={`progress-bar ${barClass}`}
                             style={{ width: `${cappedPercentage}%` }}
                         ></div>
                     </div>
 
-                    <p style={{ color: '#94a3b8', textAlign: 'right', margin: '0 0 16px 0', fontSize: '0.9rem' }}>
-                        {percentage.toFixed(1)}% spent
-                    </p>
+                    {/* Tick markers */}
+                    <div className="progress-markers">
+                        <span>0%</span>
+                        <span className="marker-75">75%</span>
+                        <span className="marker-90">90%</span>
+                        <span>100%</span>
+                    </div>
 
-                    {percentage > 100 && (
-                        <div className="warning-message">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            <span>Warning: You have exceeded your monthly budget by ₹{(currentMonthSpent - budgetLimit).toLocaleString()}!</span>
-                        </div>
-                    )}
+                    {/* Status message banner */}
+                    <div className="budget-status-message" style={{
+                        background: status.bg,
+                        border: `1px solid ${status.border}`,
+                        color: status.color
+                    }}>
+                        <strong>{status.label}</strong>
+                        {tier === 'exceeded' && (
+                            <span className="exceeded-amount">
+                                Over by ₹{(currentMonthSpent - budgetLimit).toLocaleString()}
+                            </span>
+                        )}
+                        {tier === 'warning' && (
+                            <span className="exceeded-amount">
+                                Only ₹{remaining.toLocaleString()} remaining
+                            </span>
+                        )}
+                        {tier === 'danger' && (
+                            <span className="exceeded-amount">
+                                Critical — only ₹{remaining.toLocaleString()} left
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,11 +1,85 @@
 .layout-container {
     display: flex;
     height: 100vh;
-    background-color: #0f172a; /* Dark background */
-    color: #f8fafc;
+    background-color: var(--bg-page);
+    color: var(--text-main);
     overflow: hidden;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-family);
+    transition: background-color 0.3s, color 0.3s;
 }
+
+.layout-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.layout-content {
+    flex-grow: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: var(--bg-page);
+    background-image:
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,0.6) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,0.08) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339,49%,30%,0.08) 0, transparent 50%);
+    transition: background-color 0.3s;
+}
+
+/* Remove gradient tint in light mode */
+body.light-theme .layout-content {
+    background-image: none;
+}
+
+/* ── Scrollbar ── */
+.layout-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.layout-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.layout-content::-webkit-scrollbar-thumb {
+    background: var(--border-input);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.layout-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ── Mobile overlay ── */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 15;
+    display: none;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .layout-content {
+        padding: 1rem;
+    }
+
+    .sidebar-overlay {
+        display: block;
+    }
+}
+
 
 .layout-main {
     flex-grow: 1;

@@ -1,10 +1,202 @@
 .ai-insights-container {
     padding: 10px;
-    font-family: 'Inter', sans-serif;
-    color: #f8fafc;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-main);
     max-width: 1400px;
     margin: 0 auto;
+    background-color: var(--bg-page);
+    min-height: 100%;
 }
+
+.ai-insights-header { margin-bottom: 32px; }
+
+.ai-insights-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-insights-header h1 svg { color: #8b5cf6; }
+
+.ai-insights-header p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 1rem;
+}
+
+.ai-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+}
+
+.ai-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.ai-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+    opacity: 0.8;
+}
+
+.col-span-12 { grid-column: span 12; }
+.col-span-6  { grid-column: span 6; }
+.col-span-4  { grid-column: span 4; }
+
+@media (max-width: 1024px) {
+    .col-span-6, .col-span-4 { grid-column: span 12; }
+}
+
+.ai-card h2 {
+    font-size: 1.25rem;
+    margin: 0 0 20px 0;
+    color: var(--text-main);
+    font-weight: 600;
+    letter-spacing: -0.25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-card h2 svg { color: var(--primary-color); }
+
+/* Prediction Styles */
+.prediction-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-input);
+    padding: 32px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.prediction-amount h3 {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+.prediction-amount h1 {
+    font-size: 3.5rem;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    background: linear-gradient(to right, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.prediction-trend {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.trend-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.trend-badge.up   { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.trend-badge.down { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+/* Patterns & Suggestions Styles */
+.pattern-list, .suggestion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pattern-item, .suggestion-item {
+    background: var(--bg-input);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #8b5cf6;
+    border-top: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.suggestion-item { border-left-color: #10b981; }
+
+.pattern-item:hover, .suggestion-item:hover {
+    transform: translateX(4px);
+}
+
+.suggestion-item.high {
+    background: rgba(239, 68, 68, 0.08);
+    border-left-color: #ef4444;
+}
+
+.suggestion-item.moderate {
+    background: rgba(245, 158, 11, 0.08);
+    border-left-color: #f59e0b;
+}
+
+.suggestion-item.low {
+    background: rgba(16, 185, 129, 0.08);
+    border-left-color: #10b981;
+}
+
+.pattern-item h4, .suggestion-item h4 {
+    margin: 0 0 8px 0;
+    color: var(--text-main);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.pattern-item p, .suggestion-item p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.suggestion-action {
+    margin-top: 12px;
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    transition: background 0.2s;
+}
+
+.suggestion-action:hover { background: rgba(16, 185, 129, 0.2); }
+
 
 .ai-insights-header {
     margin-bottom: 32px;

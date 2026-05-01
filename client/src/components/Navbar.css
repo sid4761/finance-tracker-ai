@@ -1,19 +1,20 @@
 .navbar {
     height: 70px;
-    background-color: rgba(15, 23, 42, 0.8);
+    background-color: var(--bg-navbar);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem;
     z-index: 5;
+    transition: background-color 0.3s;
 }
 
 .navbar-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #f8fafc;
+    color: var(--text-main);
     letter-spacing: -0.01em;
 }
 
@@ -44,8 +45,8 @@
 
 .logout-nav-btn {
     background-color: transparent;
-    color: #94a3b8;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border: 1px solid var(--border-input);
     padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
@@ -63,7 +64,7 @@
     display: block;
     background: transparent;
     border: none;
-    color: #f8fafc;
+    color: var(--text-main);
     cursor: pointer;
     padding: 4px;
     transition: transform 0.2s;
@@ -74,8 +75,8 @@
 }
 
 .theme-toggle-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: var(--border-color);
+    border: 1px solid var(--border-input);
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -83,12 +84,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: var(--text-main);
     font-size: 1.2rem;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 .theme-toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-input);
 }
 
 @media (max-width: 768px) {

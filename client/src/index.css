@@ -1,22 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+/* ===== DARK THEME (default) ===== */
 :root {
-  --bg-dark: #0f172a;
-  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
-  --accent-color: #8b5cf6;
+  --bg-page:       #0f172a;
+  --bg-card:       #1e293b;
+  --bg-input:      #0f172a;
+  --bg-sidebar:    rgba(15, 23, 42, 0.9);
+  --bg-navbar:     rgba(15, 23, 42, 0.8);
 
-  --glass-bg: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --border-color:  rgba(255, 255, 255, 0.07);
+  --border-input:  rgba(255, 255, 255, 0.1);
 
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --text-main:     #f8fafc;
+  --text-muted:    #94a3b8;
+  --text-subtle:   #cbd5e1;
 
-  --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --primary-color:  #3b82f6;
+  --primary-hover:  #2563eb;
+  --accent-color:   #8b5cf6;
+
+  --card-shadow:   0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  --glass-shadow:  0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* ===== LIGHT THEME ===== */
+body.light-theme {
+  --bg-page:       #f1f5f9;
+  --bg-card:       #ffffff;
+  --bg-input:      #f8fafc;
+  --bg-sidebar:    rgba(255, 255, 255, 0.97);
+  --bg-navbar:     rgba(255, 255, 255, 0.97);
+
+  --border-color:  rgba(0, 0, 0, 0.08);
+  --border-input:  rgba(0, 0, 0, 0.12);
+
+  --text-main:     #0f172a;
+  --text-muted:    #64748b;
+  --text-subtle:   #475569;
+
+  --card-shadow:   0 4px 12px rgba(0, 0, 0, 0.07);
+  --glass-shadow:  0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== BASE ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -28,91 +56,18 @@ body {
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-dark);
+  background-color: var(--bg-page);
   color: var(--text-main);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Base utility classes for future use */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   box-shadow: var(--glass-shadow);
   border-radius: 16px;
-}
-
-/* Light Theme Overrides */
-body.light-theme {
-  --bg-dark: #f8fafc;
-  --text-main: #0f172a;
-  --text-muted: #475569;
-}
-
-body.light-theme .layout-container,
-body.light-theme .layout-content,
-body.light-theme .dashboard-container {
-  background-color: var(--bg-dark);
-  background-image: none;
-}
-
-body.light-theme .sidebar,
-body.light-theme .navbar {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-body.light-theme .sidebar-link,
-body.light-theme .navbar-title,
-body.light-theme .hamburger-btn,
-body.light-theme .dashboard-section h2 {
-  color: var(--text-main);
-}
-
-body.light-theme .sidebar-logo {
-  color: var(--text-main);
-}
-
-body.light-theme .dashboard-section,
-body.light-theme .summary-card,
-body.light-theme .insight-card,
-body.light-theme .transaction-item,
-body.light-theme .filters-group input,
-body.light-theme .filters-group select,
-body.light-theme .form-group input,
-body.light-theme .form-group select {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.1);
-  color: var(--text-main);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-body.light-theme .type-toggle {
-    background: #f1f5f9;
-}
-
-body.light-theme .summary-details h2,
-body.light-theme .transaction-amount.expense,
-body.light-theme .transaction-category,
-body.light-theme .insight-card strong {
-  color: var(--text-main);
-}
-
-body.light-theme .theme-toggle-btn {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--text-main);
-}
-
-body.light-theme .theme-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-body.light-theme .suggestion-item.high,
-body.light-theme .suggestion-item.moderate,
-body.light-theme .suggestion-item.low {
-  color: var(--text-main);
-}
+}
