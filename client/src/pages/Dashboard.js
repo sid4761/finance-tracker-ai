@@ -21,15 +21,15 @@ ChartJS.register(
     BarElement
 );
 
-// Set default chart font color for dark mode
-ChartJS.defaults.color = '#f8fafc'; 
-ChartJS.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+ChartJS.defaults.color = '#94a3b8';
+ChartJS.defaults.borderColor = 'rgba(255, 255, 255, 0.05)';
 
 function Dashboard() {
     const [transactions, setTransactions] = useState([]);
     const [amount, setAmount] = useState("");
     const [category, setCategory] = useState("");
     const [date, setDate] = useState("");
+    const [transactionType, setTransactionType] = useState("expense");
 
     const [categoryData, setCategoryData] = useState({});
     const [monthlyData, setMonthlyData] = useState({});
@@ -93,11 +93,14 @@ function Dashboard() {
     const addTransaction = async (e) => {
         e.preventDefault();
 
+        // Save income as negative, expenses as positive to avoid DB schema changes while supporting both
+        const payloadAmount = transactionType === "expense" ? Math.abs(Number(amount)) : -Math.abs(Number(amount));
+
         try {
             await API.post(
                 "/transactions",
                 {
-                    amount: Number(amount),
+                    amount: payloadAmount,
                     category,
                     date,
                     description: "Added from dashboard",
@@ -108,7 +111,6 @@ function Dashboard() {
             setAmount("");
             setCategory("");
             setDate("");
-
             refreshDashboard();
         } catch (error) {
             console.log(error);
@@ -126,11 +128,6 @@ function Dashboard() {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-    };
-
     useEffect(() => {
         getTransactions();
         getCategoryAnalytics();
@@ -139,10 +136,10 @@ function Dashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const totalSpent = transactions.reduce(
-        (sum, t) => sum + Number(t.amount),
-        0
-    );
+    // Calculate financials (Expenses are positive amounts, Income is negative amounts)
+    const totalExpense = transactions.reduce((sum, t) => Number(t.amount) > 0 ? sum + Number(t.amount) : sum, 0);
+    const totalIncome = transactions.reduce((sum, t) => Number(t.amount) < 0 ? sum + Math.abs(Number(t.amount)) : sum, 0);
+    const totalBalance = totalIncome - totalExpense;
 
     const totalTransactions = transactions.length;
 
@@ -153,8 +150,6 @@ function Dashboard() {
             )
             : "No data";
 
-    const thisMonthSpent = totalSpent;
-
     const predictedNextMonth =
         Object.values(monthlyData).length > 0
             ? Math.round(
@@ -162,16 +157,6 @@ function Dashboard() {
                 Object.values(monthlyData).length
             )
             : 0;
-
-    const savingSuggestion =
-        topCategory !== "No data"
-            ? `Try reducing ${topCategory} spending by 15% next month.`
-            : "Add more transactions to generate savings suggestions.";
-
-    const overspendingWarning =
-        totalSpent > 5000
-            ? "Warning: Your total spending is high this month."
-            : "Your spending is currently under control.";
 
     const uniqueCategories = [
         "All",
@@ -186,8 +171,8 @@ function Dashboard() {
             filterCategory === "All" ? true : t.category === filterCategory
         )
         .sort((a, b) => {
-            if (sortOption === "highest") return b.amount - a.amount;
-            if (sortOption === "lowest") return a.amount - b.amount;
+            if (sortOption === "highest") return Math.abs(b.amount) - Math.abs(a.amount);
+            if (sortOption === "lowest") return Math.abs(a.amount) - Math.abs(b.amount);
             if (sortOption === "oldest") return new Date(a.date) - new Date(b.date);
             return new Date(b.date) - new Date(a.date);
         });
@@ -198,14 +183,11 @@ function Dashboard() {
             {
                 data: Object.values(categoryData),
                 backgroundColor: [
-                    "#3b82f6", // Primary
-                    "#8b5cf6", // Accent
-                    "#10b981", // Green
-                    "#f59e0b", // Yellow
-                    "#ec4899", // Pink
+                    "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ec4899", "#06b6d4"
                 ],
-                borderColor: "rgba(15, 23, 42, 0.8)",
-                borderWidth: 2,
+                borderColor: "#1e293b",
+                borderWidth: 3,
+                hoverOffset: 4
             },
         ],
     };
@@ -214,183 +196,220 @@ function Dashboard() {
         labels: Object.keys(monthlyData),
         datasets: [
             {
-                label: "Monthly Spending",
+                label: "Monthly Activity",
                 data: Object.values(monthlyData),
                 backgroundColor: "#3b82f6",
-                borderRadius: 6,
+                borderRadius: 4,
             },
         ],
     };
 
     return (
         <div className="dashboard-container">
-            <header className="dashboard-header">
-                <h1 className="dashboard-title">AI Finance Dashboard</h1>
-                <button onClick={logout} className="logout-btn">
-                    Logout
-                </button>
-            </header>
-
-            <div className="kpi-container">
-                <div className="kpi-card glass-panel">
-                    <h3>This Month Spending</h3>
-                    <h2>₹{thisMonthSpent}</h2>
+            {/* Professional Summary Cards */}
+            <div className="summary-container">
+                <div className="summary-card">
+                    <div className="summary-icon balance">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div className="summary-details">
+                        <h3>Total Balance</h3>
+                        <h2 style={{ color: totalBalance < 0 ? '#ef4444' : '#f8fafc' }}>
+                            {totalBalance < 0 ? '-' : ''}₹{Math.abs(totalBalance).toLocaleString()}
+                        </h2>
+                    </div>
                 </div>
 
-                <div className="kpi-card glass-panel">
-                    <h3>Top Category</h3>
-                    <h2>{topCategory}</h2>
+                <div className="summary-card">
+                    <div className="summary-icon income">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <div className="summary-details">
+                        <h3>Total Income</h3>
+                        <h2>₹{totalIncome.toLocaleString()}</h2>
+                    </div>
                 </div>
 
-                <div className="kpi-card glass-panel">
-                    <h3>Total Transactions</h3>
-                    <h2>{totalTransactions}</h2>
-                </div>
-
-                <div className="kpi-card glass-panel">
-                    <h3>Predicted Next Month</h3>
-                    <h2>₹{predictedNextMonth}</h2>
+                <div className="summary-card">
+                    <div className="summary-icon expense">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path></svg>
+                    </div>
+                    <div className="summary-details">
+                        <h3>Total Expense</h3>
+                        <h2>₹{totalExpense.toLocaleString()}</h2>
+                    </div>
                 </div>
             </div>
 
             <div className="dashboard-grid">
-                {/* Add Expense Section */}
-                <div className="dashboard-section glass-panel">
-                    <h2>Add Expense</h2>
-                    <form onSubmit={addTransaction}>
+                {/* Add Transaction Section (Left Column) */}
+                <div className="dashboard-section col-span-4">
+                    <div className="section-header">
+                        <h2>Add Transaction</h2>
+                    </div>
+                    <form onSubmit={addTransaction} className="transaction-form">
+                        <div className="type-toggle">
+                            <button
+                                type="button"
+                                className={`type-btn expense ${transactionType === 'expense' ? 'active' : ''}`}
+                                onClick={() => setTransactionType('expense')}
+                            >
+                                Expense
+                            </button>
+                            <button
+                                type="button"
+                                className={`type-btn income ${transactionType === 'income' ? 'active' : ''}`}
+                                onClick={() => setTransactionType('income')}
+                            >
+                                Income
+                            </button>
+                        </div>
                         <div className="form-group">
                             <input
                                 type="number"
-                                placeholder="Amount"
+                                placeholder="Amount (₹)"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="dashboard-input"
                                 required
-                                min="0"
+                                min="1"
                             />
                             <input
                                 type="text"
-                                placeholder="Category"
+                                placeholder="Category (e.g. Salary, Food)"
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="dashboard-input"
                                 required
                             />
                             <input
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="dashboard-input"
                                 required
                             />
                         </div>
                         <button type="submit" className="btn-primary">
-                            Add Transaction
+                            Add {transactionType === 'income' ? 'Income' : 'Expense'}
                         </button>
                     </form>
                 </div>
 
-                {/* AI Insights Section */}
-                <div className="dashboard-section glass-panel" style={{ borderLeft: "4px solid var(--accent-color)" }}>
-                    <h2>AI Financial Insights</h2>
+                {/* AI Insights Section (Middle Column) */}
+                <div className="dashboard-section col-span-4">
+                    <div className="section-header">
+                        <h2>AI Financial Insights</h2>
+                    </div>
                     <div className="insights-content">
                         {insight && insight.advice ? (
                             <>
-                                <p><strong>Total Spent:</strong> ₹{insight.totalSpent}</p>
-                                <p><strong>Top Category:</strong> {insight.topCategory}</p>
-                                <p><strong>Advice:</strong> {insight.advice}</p>
-                                <p><strong>Prediction:</strong> You may spend around ₹{predictedNextMonth} next month.</p>
-                                <p><strong>Overspending Status:</strong> {overspendingWarning}</p>
-                                <p><strong>Saving Suggestion:</strong> {savingSuggestion}</p>
+                                <div className="insight-card">
+                                    <p><strong>Advice:</strong> {insight.advice}</p>
+                                </div>
+                                <div className="insight-card" style={{ borderLeftColor: '#3b82f6' }}>
+                                    <p><strong>Top Expense:</strong> {topCategory}</p>
+                                    <p><strong>Next Month Predicted:</strong> ₹{predictedNextMonth}</p>
+                                </div>
+                                <div className="insight-card" style={{ borderLeftColor: totalExpense > 5000 ? '#ef4444' : '#10b981' }}>
+                                    <p><strong>Status:</strong> {totalExpense > 5000 ? 'High spending this month.' : 'Spending under control.'}</p>
+                                </div>
                             </>
                         ) : (
-                            <p>No AI insights available yet.</p>
+                            <p style={{ color: '#94a3b8' }}>Analyzing your financial data to generate insights...</p>
                         )}
                     </div>
                 </div>
 
-                {/* Spending by Category */}
-                <div className="dashboard-section glass-panel">
-                    <h2>Spending by Category</h2>
+                {/* Category Chart (Right Column) */}
+                <div className="dashboard-section col-span-4">
+                    <div className="section-header">
+                        <h2>Spending by Category</h2>
+                    </div>
                     <div className="chart-container">
                         {Object.keys(categoryData).length > 0 ? (
-                            <Pie data={chartData} options={{ maintainAspectRatio: false }} />
+                            <Pie data={chartData} options={{ maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }} />
                         ) : (
-                            <p>No chart data yet. Add transactions first.</p>
+                            <p style={{ color: '#94a3b8' }}>Add expenses to see breakdown.</p>
                         )}
                     </div>
                 </div>
 
-                {/* Monthly Spending Trend */}
-                <div className="dashboard-section glass-panel" style={{ gridColumn: "1 / -1" }}>
-                    <h2>Monthly Spending Trend</h2>
-                    <div className="chart-container">
+                {/* Monthly Trend (Spans Full Width) */}
+                <div className="dashboard-section col-span-12">
+                    <div className="section-header">
+                        <h2>Monthly Overview</h2>
+                        <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>{totalTransactions} total records</span>
+                    </div>
+                    <div className="chart-container" style={{ height: '250px' }}>
                         {Object.keys(monthlyData).length > 0 ? (
                             <Bar data={monthlyChartData} options={{ maintainAspectRatio: false }} />
                         ) : (
-                            <p>No monthly data yet.</p>
+                            <p style={{ color: '#94a3b8' }}>No monthly data available.</p>
                         )}
                     </div>
                 </div>
-            </div>
 
-            {/* Recent Transactions */}
-            <div className="dashboard-section glass-panel">
-                <h2>Recent Transactions</h2>
-                
-                <div className="filters-group">
-                    <input
-                        type="text"
-                        placeholder="Search category..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="dashboard-input"
-                    />
-                    <select
-                        value={filterCategory}
-                        onChange={(e) => setFilterCategory(e.target.value)}
-                        className="dashboard-input"
-                    >
-                        {uniqueCategories.map((cat) => (
-                            <option key={cat} value={cat}>
-                                {cat}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={sortOption}
-                        onChange={(e) => setSortOption(e.target.value)}
-                        className="dashboard-input"
-                    >
-                        <option value="latest">Latest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="highest">Highest Amount</option>
-                        <option value="lowest">Lowest Amount</option>
-                    </select>
+                {/* Recent Transactions (Spans Full Width) */}
+                <div className="dashboard-section col-span-12">
+                    <div className="section-header">
+                        <h2>Recent Transactions</h2>
+                    </div>
+
+                    <div className="filters-group">
+                        <input
+                            type="text"
+                            placeholder="Search category..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                        >
+                            {uniqueCategories.map((cat) => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <select
+                            value={sortOption}
+                            onChange={(e) => setSortOption(e.target.value)}
+                        >
+                            <option value="latest">Latest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="highest">Highest Amount</option>
+                            <option value="lowest">Lowest Amount</option>
+                        </select>
+                    </div>
+
+                    <ul className="transaction-list">
+                        {filteredTransactions.map((t) => {
+                            const isExpense = Number(t.amount) > 0;
+                            const displayAmount = Math.abs(Number(t.amount));
+                            return (
+                                <li key={t._id} className="transaction-item">
+                                    <div className="transaction-info">
+                                        <div className={`transaction-icon ${isExpense ? 'expense' : 'income'}`}>
+                                            {isExpense ? '↓' : '↑'}
+                                        </div>
+                                        <div className="transaction-details">
+                                            <span className="transaction-category">{t.category}</span>
+                                            <span className="transaction-date">{new Date(t.date).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                    <div className="transaction-amount-container">
+                                        <span className={`transaction-amount ${isExpense ? 'expense' : 'income'}`}>
+                                            {isExpense ? '-' : '+'}₹{displayAmount.toLocaleString()}
+                                        </span>
+                                        <button onClick={() => deleteTransaction(t._id)} className="delete-btn" aria-label="Delete">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                        {filteredTransactions.length === 0 && (
+                            <p style={{ textAlign: 'center', color: '#94a3b8', padding: '20px' }}>No transactions found.</p>
+                        )}
+                    </ul>
                 </div>
-
-                <ul className="transaction-list">
-                    {filteredTransactions.map((t) => (
-                        <li key={t._id} className="transaction-item">
-                            <div className="transaction-details">
-                                <span className="transaction-category">{t.category}</span>
-                                <span className="transaction-date">{new Date(t.date).toLocaleDateString()}</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                <span className="transaction-amount">₹{t.amount}</span>
-                                <button
-                                    onClick={() => deleteTransaction(t._id)}
-                                    className="delete-btn"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                    {filteredTransactions.length === 0 && (
-                        <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No transactions found.</p>
-                    )}
-                </ul>
             </div>
         </div>
     );

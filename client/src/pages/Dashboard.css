@@ -1,171 +1,290 @@
+/* Professional Fintech Dashboard Styles */
+
 .dashboard-container {
-  min-height: 100vh;
-  padding: 30px;
-  background: var(--bg-gradient);
-  font-family: var(--font-family);
-  color: var(--text-main);
+  padding: 10px;
+  font-family: 'Inter', sans-serif;
+  color: #f8fafc;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+/* Overview Summary Cards */
+.summary-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
-.dashboard-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  background: -webkit-linear-gradient(left, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.logout-btn {
-  background: rgba(239, 68, 68, 0.2);
-  /* Red tint */
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.logout-btn:hover {
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
-}
-
-.kpi-container {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-
-.kpi-card {
-  flex: 1;
-  min-width: 220px;
+.summary-card {
+  background: #1e293b;
+  border-radius: 20px;
   padding: 24px;
-  text-align: center;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.kpi-card h3 {
-  color: var(--text-muted);
-  font-size: 1rem;
-  margin-bottom: 10px;
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.summary-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.summary-icon.balance {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.summary-icon.income {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.summary-icon.expense {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.summary-details h3 {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin: 0 0 8px 0;
   font-weight: 500;
 }
 
-.kpi-card h2 {
+.summary-details h2 {
   font-size: 2rem;
-  font-weight: 700;
+  color: #f8fafc;
   margin: 0;
-  color: var(--primary-color);
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
+/* Main Grid Layout */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(12, 1fr);
   gap: 24px;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
 }
 
 .dashboard-section {
-  padding: 24px;
+  background: #1e293b;
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.col-span-4 {
+  grid-column: span 4;
+}
+
+.col-span-8 {
+  grid-column: span 8;
+}
+
+.col-span-12 {
+  grid-column: span 12;
+}
+
+@media (max-width: 1024px) {
+
+  .col-span-4,
+  .col-span-8 {
+    grid-column: span 12;
+  }
+}
+
+.section-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
 .dashboard-section h2 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: var(--text-main);
-  border-bottom: 1px solid var(--glass-border);
-  padding-bottom: 10px;
+  font-size: 1.25rem;
+  margin: 0;
+  color: #f8fafc;
+  font-weight: 600;
+  letter-spacing: -0.25px;
 }
 
-.form-group {
+/* Forms and Inputs */
+.transaction-form {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.dashboard-input {
+.type-toggle {
+  display: flex;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+
+.type-btn {
   flex: 1;
-  min-width: 150px;
-  padding: 12px 16px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--glass-border);
+  padding: 10px;
+  text-align: center;
   border-radius: 8px;
-  color: var(--text-main);
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.type-btn.active.expense {
+  background: #ef4444;
+  color: white;
+}
+
+.type-btn.active.income {
+  background: #10b981;
+  color: white;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 14px 16px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #f8fafc;
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
-.dashboard-input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .btn-primary {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  padding: 14px 24px;
+  background: #3b82f6;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  align-self: flex-start;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+  margin-top: 8px;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+  background: #2563eb;
 }
 
-.insights-content p {
-  margin-bottom: 12px;
-  line-height: 1.6;
-  font-size: 1.05rem;
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
-.insights-content strong {
-  color: var(--accent-color);
+/* AI Insights */
+.insights-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+.insight-card {
+  background: #0f172a;
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid #8b5cf6;
+}
+
+.insight-card p {
+  margin: 0 0 8px 0;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.insight-card p:last-child {
+  margin-bottom: 0;
+}
+
+.insight-card strong {
+  color: #f8fafc;
+}
+
+/* Charts */
+.chart-container {
+  position: relative;
+  height: 320px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Transactions List */
 .filters-group {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filters-group input,
+.filters-group select {
+  flex: 1;
+  padding: 12px 16px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #f8fafc;
+  font-size: 0.95rem;
 }
 
 .transaction-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
+  padding-right: 8px;
 }
 
-/* Custom scrollbar for transaction list */
 .transaction-list::-webkit-scrollbar {
   width: 6px;
 }
 
 .transaction-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
+  background: #0f172a;
   border-radius: 4px;
 }
 
@@ -179,15 +298,44 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  margin-bottom: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  transition: background 0.3s;
+  margin-bottom: 12px;
+  background: #0f172a;
+  border-radius: 12px;
+  transition: transform 0.2s, background 0.2s;
+  border: 1px solid transparent;
 }
 
 .transaction-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.transaction-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-right: 16px;
+}
+
+.transaction-icon.expense {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.transaction-icon.income {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.transaction-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .transaction-details {
@@ -198,54 +346,61 @@
 
 .transaction-category {
   font-weight: 600;
-  color: var(--text-main);
-  font-size: 1.1rem;
+  color: #f8fafc;
+  font-size: 1rem;
 }
 
 .transaction-date {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #94a3b8;
+}
+
+.transaction-amount-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .transaction-amount {
   font-weight: 700;
-  color: #ef4444;
-  /* Red for expenses */
   font-size: 1.1rem;
 }
 
+.transaction-amount.expense {
+  color: #f8fafc;
+}
+
+.transaction-amount.income {
+  color: #10b981;
+}
+
 .delete-btn {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
   border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.2s;
 }
 
 .delete-btn:hover {
-  background: rgba(239, 68, 68, 0.6);
-  color: white;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
 }
 
-/* Chart container adjustments */
-.chart-container {
-  position: relative;
-  height: 300px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Hide number input spin buttons */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 
 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
