@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api"
+  baseURL: "https://finance-backend-gfd5.onrender.com/api"
 });
 
-// Automatically attach JWT token to every request
+// Automatically attach JWT token
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
