@@ -10,6 +10,7 @@ import {
     LinearScale,
     BarElement,
 } from "chart.js";
+import "./Dashboard.css";
 
 ChartJS.register(
     ArcElement,
@@ -19,6 +20,10 @@ ChartJS.register(
     LinearScale,
     BarElement
 );
+
+// Set default chart font color for dark mode
+ChartJS.defaults.color = '#f8fafc'; 
+ChartJS.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
 
 function Dashboard() {
     const [transactions, setTransactions] = useState([]);
@@ -187,44 +192,20 @@ function Dashboard() {
             return new Date(b.date) - new Date(a.date);
         });
 
-    const cardStyle = {
-        background: "white",
-        padding: "20px",
-        borderRadius: "12px",
-        width: "220px",
-        textAlign: "center",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    };
-
-    const sectionStyle = {
-        background: "white",
-        padding: "20px",
-        borderRadius: "12px",
-        width: "90%",
-        maxWidth: "500px",
-        margin: "20px auto",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    };
-
-    const inputStyle = {
-        padding: "10px",
-        margin: "5px",
-        width: "90%",
-        maxWidth: "200px",
-    };
-
     const chartData = {
         labels: Object.keys(categoryData),
         datasets: [
             {
                 data: Object.values(categoryData),
                 backgroundColor: [
-                    "#FF6384",
-                    "#36A2EB",
-                    "#FFCE56",
-                    "#4CAF50",
-                    "#9C27B0",
+                    "#3b82f6", // Primary
+                    "#8b5cf6", // Accent
+                    "#10b981", // Green
+                    "#f59e0b", // Yellow
+                    "#ec4899", // Pink
                 ],
+                borderColor: "rgba(15, 23, 42, 0.8)",
+                borderWidth: 2,
             },
         ],
     };
@@ -235,238 +216,180 @@ function Dashboard() {
             {
                 label: "Monthly Spending",
                 data: Object.values(monthlyData),
-                backgroundColor: "#36A2EB",
+                backgroundColor: "#3b82f6",
+                borderRadius: 6,
             },
         ],
     };
 
     return (
-        <div
-            style={{
-                background: "#f5f7fa",
-                minHeight: "100vh",
-                padding: "30px",
-                fontFamily: "Arial",
-            }}
-        >
-            <button
-                onClick={logout}
-                style={{
-                    float: "right",
-                    background: "#333",
-                    color: "white",
-                    padding: "10px 15px",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                }}
-            >
-                Logout
-            </button>
+        <div className="dashboard-container">
+            <header className="dashboard-header">
+                <h1 className="dashboard-title">AI Finance Dashboard</h1>
+                <button onClick={logout} className="logout-btn">
+                    Logout
+                </button>
+            </header>
 
-            <h1 style={{ textAlign: "center", color: "#333" }}>
-                AI Finance Dashboard
-            </h1>
-
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "20px",
-                    flexWrap: "wrap",
-                    marginTop: "20px",
-                }}
-            >
-                <div style={cardStyle}>
+            <div className="kpi-container">
+                <div className="kpi-card glass-panel">
                     <h3>This Month Spending</h3>
                     <h2>₹{thisMonthSpent}</h2>
                 </div>
 
-                <div style={cardStyle}>
+                <div className="kpi-card glass-panel">
                     <h3>Top Category</h3>
                     <h2>{topCategory}</h2>
                 </div>
 
-                <div style={cardStyle}>
+                <div className="kpi-card glass-panel">
                     <h3>Total Transactions</h3>
                     <h2>{totalTransactions}</h2>
                 </div>
 
-                <div style={cardStyle}>
+                <div className="kpi-card glass-panel">
                     <h3>Predicted Next Month</h3>
                     <h2>₹{predictedNextMonth}</h2>
                 </div>
             </div>
 
-            <div style={sectionStyle}>
-                <h2>Add Expense</h2>
+            <div className="dashboard-grid">
+                {/* Add Expense Section */}
+                <div className="dashboard-section glass-panel">
+                    <h2>Add Expense</h2>
+                    <form onSubmit={addTransaction}>
+                        <div className="form-group">
+                            <input
+                                type="number"
+                                placeholder="Amount"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                className="dashboard-input"
+                                required
+                                min="0"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Category"
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="dashboard-input"
+                                required
+                            />
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="dashboard-input"
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn-primary">
+                            Add Transaction
+                        </button>
+                    </form>
+                </div>
 
-                <form onSubmit={addTransaction}>
-                    <input
-                        type="number"
-                        placeholder="Amount"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        style={inputStyle}
-                        required
-                    />
+                {/* AI Insights Section */}
+                <div className="dashboard-section glass-panel" style={{ borderLeft: "4px solid var(--accent-color)" }}>
+                    <h2>AI Financial Insights</h2>
+                    <div className="insights-content">
+                        {insight && insight.advice ? (
+                            <>
+                                <p><strong>Total Spent:</strong> ₹{insight.totalSpent}</p>
+                                <p><strong>Top Category:</strong> {insight.topCategory}</p>
+                                <p><strong>Advice:</strong> {insight.advice}</p>
+                                <p><strong>Prediction:</strong> You may spend around ₹{predictedNextMonth} next month.</p>
+                                <p><strong>Overspending Status:</strong> {overspendingWarning}</p>
+                                <p><strong>Saving Suggestion:</strong> {savingSuggestion}</p>
+                            </>
+                        ) : (
+                            <p>No AI insights available yet.</p>
+                        )}
+                    </div>
+                </div>
 
+                {/* Spending by Category */}
+                <div className="dashboard-section glass-panel">
+                    <h2>Spending by Category</h2>
+                    <div className="chart-container">
+                        {Object.keys(categoryData).length > 0 ? (
+                            <Pie data={chartData} options={{ maintainAspectRatio: false }} />
+                        ) : (
+                            <p>No chart data yet. Add transactions first.</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Monthly Spending Trend */}
+                <div className="dashboard-section glass-panel">
+                    <h2>Monthly Spending Trend</h2>
+                    <div className="chart-container">
+                        {Object.keys(monthlyData).length > 0 ? (
+                            <Bar data={monthlyChartData} options={{ maintainAspectRatio: false }} />
+                        ) : (
+                            <p>No monthly data yet.</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Recent Transactions */}
+            <div className="dashboard-section glass-panel">
+                <h2>Recent Transactions</h2>
+                
+                <div className="filters-group">
                     <input
                         type="text"
-                        placeholder="Category"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        style={inputStyle}
-                        required
+                        placeholder="Search category..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="dashboard-input"
                     />
-
-                    <input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        style={inputStyle}
-                        required
-                    />
-
-                    <button
-                        type="submit"
-                        style={{
-                            padding: "10px 20px",
-                            background: "#4CAF50",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                        }}
+                    <select
+                        value={filterCategory}
+                        onChange={(e) => setFilterCategory(e.target.value)}
+                        className="dashboard-input"
                     >
-                        Add
-                    </button>
-                </form>
-            </div>
+                        {uniqueCategories.map((cat) => (
+                            <option key={cat} value={cat}>
+                                {cat}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                        className="dashboard-input"
+                    >
+                        <option value="latest">Latest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="highest">Highest Amount</option>
+                        <option value="lowest">Lowest Amount</option>
+                    </select>
+                </div>
 
-            <div style={sectionStyle}>
-                <h2>Spending by Category</h2>
-
-                {Object.keys(categoryData).length > 0 ? (
-                    <Pie data={chartData} />
-                ) : (
-                    <p>No chart data yet. Add transactions first.</p>
-                )}
-            </div>
-
-            <div style={{ ...sectionStyle, maxWidth: "700px" }}>
-                <h2>Monthly Spending Trend</h2>
-
-                {Object.keys(monthlyData).length > 0 ? (
-                    <Bar data={monthlyChartData} />
-                ) : (
-                    <p>No monthly data yet.</p>
-                )}
-            </div>
-
-            <div
-                style={{
-                    ...sectionStyle,
-                    background: "#fff3cd",
-                }}
-            >
-                <h2>AI Financial Insights</h2>
-
-                {insight && insight.advice ? (
-                    <>
-                        <p>
-                            <strong>Total Spent:</strong> ₹{insight.totalSpent}
-                        </p>
-                        <p>
-                            <strong>Top Category:</strong> {insight.topCategory}
-                        </p>
-                        <p>
-                            <strong>Advice:</strong> {insight.advice}
-                        </p>
-                        <p>
-                            <strong>Prediction:</strong> You may spend around ₹
-                            {predictedNextMonth} next month.
-                        </p>
-                        <p>
-                            <strong>Overspending Status:</strong> {overspendingWarning}
-                        </p>
-                        <p>
-                            <strong>Saving Suggestion:</strong> {savingSuggestion}
-                        </p>
-                    </>
-                ) : (
-                    <p>No AI insights available yet.</p>
-                )}
-            </div>
-
-            <div style={sectionStyle}>
-                <h2>Recent Transactions</h2>
-
-                <input
-                    type="text"
-                    placeholder="Search category..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    style={inputStyle}
-                />
-
-                <select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                    style={inputStyle}
-                >
-                    {uniqueCategories.map((cat) => (
-                        <option key={cat} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    style={inputStyle}
-                >
-                    <option value="latest">Latest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="highest">Highest Amount</option>
-                    <option value="lowest">Lowest Amount</option>
-                </select>
-
-                <ul style={{ listStyle: "none", padding: 0 }}>
+                <ul className="transaction-list">
                     {filteredTransactions.map((t) => (
-                        <li
-                            key={t._id}
-                            style={{
-                                padding: "10px",
-                                borderBottom: "1px solid #eee",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                gap: "10px",
-                                alignItems: "center",
-                                flexWrap: "wrap",
-                            }}
-                        >
-                            <span>
-                                {t.category} — ₹{t.amount} —{" "}
-                                {new Date(t.date).toLocaleDateString()}
-                            </span>
-
-                            <button
-                                onClick={() => deleteTransaction(t._id)}
-                                style={{
-                                    background: "#e74c3c",
-                                    color: "white",
-                                    border: "none",
-                                    padding: "6px 10px",
-                                    borderRadius: "6px",
-                                    cursor: "pointer",
-                                }}
-                            >
-                                Delete
-                            </button>
+                        <li key={t._id} className="transaction-item">
+                            <div className="transaction-details">
+                                <span className="transaction-category">{t.category}</span>
+                                <span className="transaction-date">{new Date(t.date).toLocaleDateString()}</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                <span className="transaction-amount">₹{t.amount}</span>
+                                <button
+                                    onClick={() => deleteTransaction(t._id)}
+                                    className="delete-btn"
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </li>
                     ))}
+                    {filteredTransactions.length === 0 && (
+                        <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No transactions found.</p>
+                    )}
                 </ul>
             </div>
         </div>
