@@ -54,6 +54,34 @@
     font-weight: 500;
 }
 
+.controls-bar input, .empty-transactions {
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+    background: #0f172a;
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .transactions-filters {
+        flex-direction: column;
+    }
+    .transactions-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    .transaction-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .transaction-amount-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
 .controls-bar input, .controls-bar select {
     padding: 12px 16px;
     background: #0f172a;

@@ -45,3 +45,74 @@ code {
   box-shadow: var(--glass-shadow);
   border-radius: 16px;
 }
+
+/* Light Theme Overrides */
+body.light-theme {
+  --bg-dark: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+}
+
+body.light-theme .layout-container,
+body.light-theme .layout-content,
+body.light-theme .dashboard-container {
+  background-color: var(--bg-dark);
+  background-image: none;
+}
+
+body.light-theme .sidebar,
+body.light-theme .navbar {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .sidebar-link,
+body.light-theme .navbar-title,
+body.light-theme .hamburger-btn,
+body.light-theme .dashboard-section h2 {
+  color: var(--text-main);
+}
+
+body.light-theme .sidebar-logo {
+  color: var(--text-main);
+}
+
+body.light-theme .dashboard-section,
+body.light-theme .summary-card,
+body.light-theme .insight-card,
+body.light-theme .transaction-item,
+body.light-theme .filters-group input,
+body.light-theme .filters-group select,
+body.light-theme .form-group input,
+body.light-theme .form-group select {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-main);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .type-toggle {
+    background: #f1f5f9;
+}
+
+body.light-theme .summary-details h2,
+body.light-theme .transaction-amount.expense,
+body.light-theme .transaction-category,
+body.light-theme .insight-card strong {
+  color: var(--text-main);
+}
+
+body.light-theme .theme-toggle-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+body.light-theme .theme-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .suggestion-item.high,
+body.light-theme .suggestion-item.moderate,
+body.light-theme .suggestion-item.low {
+  color: var(--text-main);
+}

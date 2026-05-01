@@ -31,6 +31,25 @@
     margin-bottom: 32px;
 }
 
+.analytics-empty {
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+    background: #1e293b;
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .analytics-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    .chart-wrapper {
+        min-height: 250px;
+    }
+}
+
 .analytics-card {
     background: #1e293b;
     border-radius: 20px;

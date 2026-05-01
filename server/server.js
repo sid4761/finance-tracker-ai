@@ -11,8 +11,8 @@ const transactionRoutes = require("./routes/transactionRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const aiRoutes = require("./routes/aiRoutes");
-const app = express();
 
+const app = express();
 
 connectDB();
 
@@ -24,6 +24,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/predict", require("./routes/predictRoutes"));
+app.use("/api/insights", require("./routes/insightRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API Running...");

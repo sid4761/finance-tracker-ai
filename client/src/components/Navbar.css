@@ -58,3 +58,41 @@
     color: #ef4444;
     border-color: rgba(239, 68, 68, 0.3);
 }
+
+.hamburger-btn {
+    display: block;
+    background: transparent;
+    border: none;
+    color: #f8fafc;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.2s;
+}
+
+.hamburger-btn:hover {
+    transform: scale(1.1);
+}
+
+.theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background 0.2s;
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: block;
+    }
+}

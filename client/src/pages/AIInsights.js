@@ -1,53 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import API from '../services/api';
 import './AIInsights.css';
 
 const AIInsights = () => {
-    // Mock Data for AI Insights
-    const mockData = {
-        predictedExpense: 42500,
-        trendAmount: 2500,
-        trendDirection: 'up', // 'up' or 'down'
-        trendPercentage: 5.8,
-        
-        patterns: [
-            {
-                id: 1,
-                title: "Weekend Dining Spikes",
-                description: "You consistently spend 60% of your Food & Dining budget on weekends. Consider meal prepping to balance this out."
-            },
-            {
-                id: 2,
-                title: "Subscription Creep",
-                description: "Your monthly recurring payments have increased by ₹1,200 over the last 3 months. Review your recent subscriptions."
-            },
-            {
-                id: 3,
-                title: "Consistent Saving",
-                description: "Great job! You always transfer funds to your savings account in the first week of the month."
-            }
-        ],
+    const [insights, setInsights] = useState({
+        prediction: 0,
+        totalSpent: 0,
+        topCategory: '',
+        advice: '',
+        spendingLevel: 'moderate'
+    });
+    const [loading, setLoading] = useState(true);
 
-        suggestions: [
-            {
-                id: 1,
-                title: "Negotiate Internet Bill",
-                description: "Users with similar usage patterns are paying 15% less for internet. Consider calling your provider to negotiate.",
-                actionText: "Review Bill"
-            },
-            {
-                id: 2,
-                title: "Optimize Grocery Shopping",
-                description: "Buying groceries bi-weekly instead of every few days could save you an estimated ₹3,000 this month based on your history.",
-                actionText: "Set Grocery Budget"
-            },
-            {
-                id: 3,
-                title: "Invest Idle Cash",
-                description: "You have ₹50,000 sitting idle in your checking account. Moving this to a high-yield savings could earn you ₹200/month.",
-                actionText: "Explore Options"
+    useEffect(() => {
+        const fetchInsights = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const headers = { Authorization: `Bearer ${token}` };
+
+                const [predictRes, aiRes] = await Promise.all([
+                    API.get("/predict", { headers }),
+                    API.get("/insights/behavior", { headers })
+                ]);
+
+                setInsights({
+                    prediction: predictRes.data.predictedNextMonth || 0,
+                    totalSpent: aiRes.data.totalSpent || 0,
+                    topCategory: aiRes.data.topCategory || 'N/A',
+                    advice: aiRes.data.suggestion || 'Keep tracking your expenses to get smart suggestions.',
+                    spendingLevel: aiRes.data.spendingLevel || 'moderate'
+                });
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching AI insights:", error);
+                setLoading(false);
             }
-        ]
-    };
+        };
+
+        fetchInsights();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="ai-insights-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+                <p style={{ fontSize: '1.2rem', color: '#94a3b8' }}>Analyzing your financial data...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="ai-insights-container">
@@ -70,49 +69,39 @@ const AIInsights = () => {
                     <div className="prediction-box">
                         <div className="prediction-amount">
                             <h3>Estimated Total Expense</h3>
-                            <h1>₹{mockData.predictedExpense.toLocaleString()}</h1>
-                        </div>
-                        <div className="prediction-trend">
-                            <div className={`trend-badge ${mockData.trendDirection}`}>
-                                {mockData.trendDirection === 'up' ? '↑' : '↓'} 
-                                {mockData.trendPercentage}% (₹{mockData.trendAmount.toLocaleString()})
-                            </div>
-                            <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>vs. current month</span>
+                            <h1>₹{insights.prediction.toLocaleString()}</h1>
                         </div>
                     </div>
                 </div>
 
-                {/* Spending Patterns */}
+                {/* Behavior Analysis */}
                 <div className="ai-card col-span-6">
                     <h2>
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"></path></svg>
-                        Identified Spending Patterns
+                        Behavior Analysis
                     </h2>
                     <ul className="pattern-list">
-                        {mockData.patterns.map(pattern => (
-                            <li key={pattern.id} className="pattern-item">
-                                <h4>{pattern.title}</h4>
-                                <p>{pattern.description}</p>
-                            </li>
-                        ))}
+                        <li className="pattern-item">
+                            <h4>Total Spending Overview</h4>
+                            <p>You have spent a total of ₹{insights.totalSpent.toLocaleString()} across all recorded transactions.</p>
+                        </li>
+                        <li className="pattern-item">
+                            <h4>Primary Expense Category</h4>
+                            <p>Your highest spending is currently in the <strong>{insights.topCategory}</strong> category.</p>
+                        </li>
                     </ul>
                 </div>
 
-                {/* Smart Suggestions */}
+                {/* Smart Insight */}
                 <div className="ai-card col-span-6">
                     <h2>
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                        Smart Suggestions
+                        Smart Suggestion
                     </h2>
-                    <ul className="suggestion-list">
-                        {mockData.suggestions.map(suggestion => (
-                            <li key={suggestion.id} className="suggestion-item">
-                                <h4>{suggestion.title}</h4>
-                                <p>{suggestion.description}</p>
-                                <button className="suggestion-action">{suggestion.actionText}</button>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className={`suggestion-item ${insights.spendingLevel}`} style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <h4 style={{ fontSize: '1.2rem', marginBottom: '16px' }}>AI Recommended Action</h4>
+                        <p style={{ fontSize: '1.05rem', lineHeight: '1.6' }}>{insights.advice}</p>
+                    </div>
                 </div>
 
             </div>

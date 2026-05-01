@@ -76,8 +76,14 @@ function Dashboard() {
 
     const getAIInsights = async () => {
         try {
-            const res = await API.get("/ai/insights", config);
-            setInsight(res.data);
+            const [predictRes, behaviorRes] = await Promise.all([
+                API.get("/predict", config),
+                API.get("/insights/behavior", config)
+            ]);
+            setInsight({
+                prediction: predictRes.data.predictedNextMonth || 0,
+                ...behaviorRes.data
+            });
         } catch (error) {
             console.log(error);
         }
@@ -143,20 +149,7 @@ function Dashboard() {
 
     const totalTransactions = transactions.length;
 
-    const topCategory =
-        Object.keys(categoryData).length > 0
-            ? Object.keys(categoryData).reduce((a, b) =>
-                categoryData[a] > categoryData[b] ? a : b
-            )
-            : "No data";
 
-    const predictedNextMonth =
-        Object.values(monthlyData).length > 0
-            ? Math.round(
-                Object.values(monthlyData).reduce((sum, val) => sum + Number(val), 0) /
-                Object.values(monthlyData).length
-            )
-            : 0;
 
     const uniqueCategories = [
         "All",
@@ -214,7 +207,7 @@ function Dashboard() {
                     </div>
                     <div className="summary-details">
                         <h3>Total Balance</h3>
-                        <h2 style={{ color: totalBalance < 0 ? '#ef4444' : '#f8fafc' }}>
+                        <h2 style={{ color: totalBalance < 0 ? '#ef4444' : 'inherit' }}>
                             {totalBalance < 0 ? '-' : ''}₹{Math.abs(totalBalance).toLocaleString()}
                         </h2>
                     </div>
@@ -275,7 +268,7 @@ function Dashboard() {
                             />
                             <input
                                 type="text"
-                                placeholder="Category (e.g. Salary, Food)"
+                                placeholder={transactionType === 'expense' ? "Category (e.g. Food, Rent)" : "Category (e.g. Salary, Freelance)"}
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
                                 required
@@ -299,17 +292,19 @@ function Dashboard() {
                         <h2>AI Financial Insights</h2>
                     </div>
                     <div className="insights-content">
-                        {insight && insight.advice ? (
+                        {insight && insight.suggestion ? (
                             <>
-                                <div className="insight-card">
-                                    <p><strong>Advice:</strong> {insight.advice}</p>
-                                </div>
                                 <div className="insight-card" style={{ borderLeftColor: '#3b82f6' }}>
-                                    <p><strong>Top Expense:</strong> {topCategory}</p>
-                                    <p><strong>Next Month Predicted:</strong> ₹{predictedNextMonth}</p>
+                                    <p><strong>Prediction:</strong> ₹{insight.prediction?.toLocaleString()}</p>
+                                    <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Expected next month</p>
                                 </div>
-                                <div className="insight-card" style={{ borderLeftColor: totalExpense > 5000 ? '#ef4444' : '#10b981' }}>
-                                    <p><strong>Status:</strong> {totalExpense > 5000 ? 'High spending this month.' : 'Spending under control.'}</p>
+                                <div className="insight-card" style={{ borderLeftColor: '#8b5cf6' }}>
+                                    <p><strong>Behavior:</strong> {insight.topCategory}</p>
+                                    <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Highest spending category</p>
+                                </div>
+                                <div className="insight-card" style={{ borderLeftColor: insight.spendingLevel === 'high' ? '#ef4444' : insight.spendingLevel === 'low' ? '#10b981' : '#f59e0b', background: insight.spendingLevel === 'high' ? 'rgba(239, 68, 68, 0.1)' : insight.spendingLevel === 'low' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)' }}>
+                                    <p><strong>Smart Suggestion:</strong></p>
+                                    <p style={{ fontSize: '0.9rem', marginTop: '6px', lineHeight: '1.4' }}>{insight.suggestion}</p>
                                 </div>
                             </>
                         ) : (
