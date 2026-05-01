@@ -322,7 +322,7 @@ function Dashboard() {
                 </div>
 
                 {/* Monthly Spending Trend */}
-                <div className="dashboard-section glass-panel">
+                <div className="dashboard-section glass-panel" style={{ gridColumn: "1 / -1" }}>
                     <h2>Monthly Spending Trend</h2>
                     <div className="chart-container">
                         {Object.keys(monthlyData).length > 0 ? (
